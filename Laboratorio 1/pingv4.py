@@ -5,10 +5,9 @@ import random
 from scapy.all import IP, ICMP, send
 
 def generar_relleno(longitud):
-    """Genera relleno con 0x00 + símbolos + números, sin letras"""
+
     simbolos = [ord(c) for c in "$%&#"]
     numeros = [ord(c) for c in "0123456789"]
-
     relleno = []
     for _ in range(longitud):
         tipo = random.choice(["zero", "symbol", "number"])
@@ -26,26 +25,19 @@ def main():
         sys.exit(1)
 
     mensaje = sys.argv[1]
-    destino = "8.8.8.8"   # Cambia la IP destino si lo necesitas
+    destino = "8.8.8.8"
     identificador_base = 0x1234
     seq_number = 1
 
     for i, char in enumerate(mensaje):
-        # Primer byte = carácter del mensaje
-        char_data = char.encode("utf-8")
 
-        # Generar relleno hasta completar 48 bytes
+        char_data = char.encode("utf-8")
         restante = 48 - len(char_data)
         extra_payload = generar_relleno(restante)
-
-        # Payload final
         payload = char_data + extra_payload
-
-        # Construcción del paquete ICMP
         pkt = IP(dst=destino) / ICMP(id=identificador_base + i, seq=seq_number) / payload
 
-        print(f"Enviando '{char}' -> destino {destino} "
-              f"(ID={identificador_base+i}, Seq={seq_number}, Data={len(payload)} bytes)")
+        print("Sent 1 packets.")
 
         send(pkt, verbose=0)
 
