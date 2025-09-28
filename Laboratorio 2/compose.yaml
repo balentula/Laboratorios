@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  db:
+    image: mariadb:10.11
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 6789
+      MYSQL_DATABASE: dvwa
+      MYSQL_USER: dvwa
+      MYSQL_PASSWORD: dvwa
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_ARBITRARY=1
+    depends_on:
+      - db
+
+  dvwa:
+    image: vulnerables/web-dvwa
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      - MYSQL_USER=dvwa
+      - MYSQL_PASSWORD=dvwa
+      - MYSQL_DATABASE=dvwa
+      - MYSQL_HOST=db
+    depends_on:
+      - db
+
+volumes:
+  db_data:
